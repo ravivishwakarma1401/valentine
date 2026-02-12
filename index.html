@@ -1,93 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Be My Valentine 💖</title>
-
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
-
-.container {
-    position: relative;
-}
-
-h1 {
-    color: white;
-    font-size: 2.2rem;
-    margin-bottom: 40px;
-}
-
-button {
-    font-size: 1.2rem;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    position: absolute;
-    transition: transform 0.3s ease;
-}
-
-#yesBtn {
-    background: #ff4d6d;
-    color: white;
-    left: -70px;
-}
-
-#noBtn {
-    background: #444;
-    color: white;
-    left: 70px;
-}
-
-#message {
-    color: white;
-    font-size: 1.6rem;
-    margin-top: 120px;
-}
-
-.heart {
-    position: fixed;
-    bottom: -10px;
-    font-size: 20px;
-    animation: floatUp 5s linear infinite;
-    opacity: 0.7;
-}
-
-@keyframes floatUp {
-    to {
-        transform: translateY(-110vh);
-        opacity: 0;
-    }
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-    <h1>Will you be my Valentine? 💌</h1>
-    <button id="yesBtn">Yes 💖</button>
-    <button id="noBtn">No 🙈</button>
-    <div id="message"></div>
-</div>
-
-<audio id="bgMusic" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
-</audio>
-
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
 <script>
 const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
@@ -97,19 +7,9 @@ const music = document.getElementById("bgMusic");
 let noScale = 1;
 let yesScale = 1;
 
-// Reset positions cleanly
-window.onload = () => {
-    noBtn.style.left = "70px";
-    noBtn.style.top = "0px";
-    noBtn.style.transform = "scale(1)";
-    yesBtn.style.transform = "scale(1)";
-};
-
 // Start music once
 document.body.addEventListener("click", () => {
-    if (music.paused) {
-        music.play().catch(()=>{});
-    }
+    if (music.paused) music.play().catch(()=>{});
 }, { once: true });
 
 // Shrink No + Grow Yes
@@ -121,32 +21,43 @@ function punishNo() {
     yesBtn.style.transform = `scale(${yesScale})`;
 }
 
-// Desktop: dodge when cursor close
+// Move No button randomly (always inside viewport)
+function moveNoRandom() {
+    const btnWidth = noBtn.offsetWidth;
+    const btnHeight = noBtn.offsetHeight;
+
+    const maxX = window.innerWidth - btnWidth - 20;
+    const maxY = window.innerHeight - btnHeight - 20;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
+}
+
+// DESKTOP: trigger when mouse gets near button
 document.addEventListener("mousemove", (e) => {
     const rect = noBtn.getBoundingClientRect();
-    const distanceX = e.clientX - rect.left;
-    const distanceY = e.clientY - rect.top;
 
-    if (Math.abs(distanceX) < 80 && Math.abs(distanceY) < 50) {
+    const distanceX = e.clientX - (rect.left + rect.width / 2);
+    const distanceY = e.clientY - (rect.top + rect.height / 2);
+
+    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+    if (distance < 100) {
         moveNoRandom();
         punishNo();
     }
 });
 
-// Mobile: dodge on touch
+// MOBILE: dodge on touch
 noBtn.addEventListener("touchstart", (e) => {
     e.preventDefault();
     moveNoRandom();
     punishNo();
 });
-
-function moveNoRandom() {
-    const maxX = window.innerWidth - 120;
-    const maxY = window.innerHeight - 80;
-
-    noBtn.style.left = Math.random() * maxX + "px";
-    noBtn.style.top = Math.random() * maxY + "px";
-}
 
 // YES CLICK
 yesBtn.addEventListener("click", () => {
@@ -177,6 +88,3 @@ function createHeart() {
 
 setInterval(createHeart, 400);
 </script>
-
-</body>
-</html>
