@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be My Valentine 💖</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    text-align: center;
+}
+
+.container {
+    position: relative;
+}
+
+h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+button {
+    font-size: 1.5rem;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    position: absolute;
+    transition: transform 0.3s ease;
+}
+
+#yesBtn {
+    background: #ff4d6d;
+    color: white;
+    left: -80px;
+}
+
+#noBtn {
+    background: #444;
+    color: white;
+    right: -80px;
+}
+
+#message {
+    font-size: 2rem;
+    color: white;
+    margin-top: 30px;
+}
+
+/* Floating hearts */
+.heart {
+    position: fixed;
+    bottom: -10px;
+    font-size: 20px;
+    animation: floatUp 5s linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes floatUp {
+    to {
+        transform: translateY(-110vh);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Will you be my Valentine? 💌</h1>
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 🙈</button>
+    <div id="message"></div>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+</audio>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const message = document.getElementById("message");
+const music = document.getElementById("bgMusic");
+
+let noScale = 1;
+let yesScale = 1;
+let mouseX = 0;
+let mouseY = 0;
+
+// Start music on first interaction (browser rule)
+document.body.addEventListener("click", () => {
+    music.play();
+}, { once: true });
+
+// Track mouse
+document.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+// No button slowly chases cursor
+function chaseCursor() {
+    const rect = noBtn.getBoundingClientRect();
+    const dx = mouseX - rect.left;
+    const dy = mouseY - rect.top;
+
+    noBtn.style.left = rect.left + dx * 0.02 + "px";
+    noBtn.style.top = rect.top + dy * 0.02 + "px";
+
+    requestAnimationFrame(chaseCursor);
+}
+chaseCursor();
+
+// Shrink No + Grow Yes
+function punishNo() {
+    noScale -= 0.1;
+    yesScale += 0.1;
+
+    if (noScale < 0.3) noScale = 0.3;
+
+    noBtn.style.transform = `scale(${noScale})`;
+    yesBtn.style.transform = `scale(${yesScale})`;
+}
+
+noBtn.addEventListener("mouseover", punishNo);
+noBtn.addEventListener("click", punishNo);
+
+yesBtn.addEventListener("click", () => {
+    message.innerHTML = "You finally got that right! Congratulations on a lifetime deal for awesomeness ❤️";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+
+    confetti({
+        particleCount: 300,
+        spread: 100
+    });
+});
+
+// Floating hearts
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.classList.add("heart");
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+    document.body.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 5000);
+}
+
+setInterval(createHeart, 300);
+</script>
+
+</body>
+</html>
+
