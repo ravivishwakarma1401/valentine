@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,31 +10,22 @@ body {
     margin: 0;
     height: 100vh;
     overflow: hidden;
-    font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    font-family: Arial, sans-serif;
     text-align: center;
 }
 
 .container {
-    width: 90%;
-    max-width: 500px;
     position: relative;
 }
 
 h1 {
     color: white;
-    font-size: 2rem;
+    font-size: 2.2rem;
     margin-bottom: 40px;
-}
-
-.buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    position: relative;
 }
 
 button {
@@ -43,24 +34,26 @@ button {
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    position: absolute;
+    transition: transform 0.3s ease;
 }
 
 #yesBtn {
     background: #ff4d6d;
     color: white;
+    left: -70px;
 }
 
 #noBtn {
     background: #444;
     color: white;
-    position: relative;
+    left: 70px;
 }
 
 #message {
-    font-size: 1.5rem;
     color: white;
-    margin-top: 30px;
+    font-size: 1.6rem;
+    margin-top: 120px;
 }
 
 .heart {
@@ -84,12 +77,8 @@ button {
 
 <div class="container">
     <h1>Will you be my Valentine? 💌</h1>
-
-    <div class="buttons">
-        <button id="yesBtn">Yes 💖</button>
-        <button id="noBtn">No 🙈</button>
-    </div>
-
+    <button id="yesBtn">Yes 💖</button>
+    <button id="noBtn">No 🙈</button>
     <div id="message"></div>
 </div>
 
@@ -108,23 +97,22 @@ const music = document.getElementById("bgMusic");
 let noScale = 1;
 let yesScale = 1;
 
-// Force reset on page load
+// Reset positions cleanly
 window.onload = () => {
+    noBtn.style.left = "70px";
+    noBtn.style.top = "0px";
     noBtn.style.transform = "scale(1)";
     yesBtn.style.transform = "scale(1)";
-    noBtn.style.position = "relative";
-    noBtn.style.left = "0px";
-    noBtn.style.top = "0px";
 };
 
-// Start music once (browser policy safe)
+// Start music once
 document.body.addEventListener("click", () => {
     if (music.paused) {
-        music.play().catch(() => {});
+        music.play().catch(()=>{});
     }
 }, { once: true });
 
-// Shrink No + Grow Yes safely
+// Shrink No + Grow Yes
 function punishNo() {
     noScale = Math.max(0.3, noScale - 0.1);
     yesScale += 0.1;
@@ -133,28 +121,38 @@ function punishNo() {
     yesBtn.style.transform = `scale(${yesScale})`;
 }
 
-// Desktop hover
-noBtn.addEventListener("mouseover", punishNo);
+// Desktop: dodge when cursor close
+document.addEventListener("mousemove", (e) => {
+    const rect = noBtn.getBoundingClientRect();
+    const distanceX = e.clientX - rect.left;
+    const distanceY = e.clientY - rect.top;
 
-// Mobile tap
-noBtn.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    punishNo();
-    moveNoRandom();
+    if (Math.abs(distanceX) < 80 && Math.abs(distanceY) < 50) {
+        moveNoRandom();
+        punishNo();
+    }
 });
 
-// Move No randomly (clean move, no stacking)
+// Mobile: dodge on touch
+noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNoRandom();
+    punishNo();
+});
+
 function moveNoRandom() {
     const maxX = window.innerWidth - 120;
     const maxY = window.innerHeight - 80;
 
-    noBtn.style.position = "absolute";
     noBtn.style.left = Math.random() * maxX + "px";
     noBtn.style.top = Math.random() * maxY + "px";
 }
 
+// YES CLICK
 yesBtn.addEventListener("click", () => {
-    message.innerHTML = "You finally got that right! Congratulations on a lifetime deal for awesomeness ❤️";
+    message.innerHTML =
+        "You finally got that right! Congratulations on a lifetime deal for awesomeness ❤️";
+
     yesBtn.style.display = "none";
     noBtn.style.display = "none";
 
