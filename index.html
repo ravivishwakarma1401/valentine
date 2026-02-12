@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +9,13 @@
 body {
     margin: 0;
     height: 100vh;
-    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     background: linear-gradient(135deg, #ff9a9e, #fad0c4);
     font-family: Arial, sans-serif;
     text-align: center;
+    overflow: hidden;
 }
 
 .container {
@@ -24,7 +24,6 @@ body {
 
 h1 {
     color: white;
-    font-size: 2rem;
     margin-bottom: 40px;
 }
 
@@ -35,37 +34,36 @@ h1 {
 }
 
 button {
-    font-size: 1.2rem;
-    padding: 12px 25px;
+    font-size: 18px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 #yesBtn {
-    background: #ff4d6d;
+    background-color: #ff4d6d;
     color: white;
 }
 
 #noBtn {
-    background: #444;
+    background-color: #333;
     color: white;
 }
 
 #message {
-    color: white;
-    font-size: 1.5rem;
     margin-top: 30px;
+    font-size: 22px;
+    color: white;
 }
 
-/* Floating hearts */
+/* floating hearts */
 .heart {
     position: fixed;
-    bottom: -10px;
+    bottom: -20px;
     font-size: 20px;
     animation: floatUp 5s linear infinite;
-    opacity: 0.7;
 }
 
 @keyframes floatUp {
@@ -91,61 +89,60 @@ button {
 </div>
 
 <audio id="bgMusic" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
 </audio>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <script>
-const noBtn = document.getElementById("noBtn");
 const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
 const message = document.getElementById("message");
 const music = document.getElementById("bgMusic");
 
-let noScale = 1;
-let yesScale = 1;
+let yesSize = 1;
+let noSize = 1;
 
-// Start music once (browser policy safe)
+// play music after first interaction
 document.body.addEventListener("click", () => {
-    if (music.paused) music.play().catch(()=>{});
+    music.play().catch(()=>{});
 }, { once: true });
 
-// Shrink No + Grow Yes
-function punishNo() {
-    noScale = Math.max(0.3, noScale - 0.1);
-    yesScale += 0.1;
+// shrink no, grow yes
+function adjustSizes() {
+    noSize = Math.max(0.4, noSize - 0.1);
+    yesSize += 0.1;
 
-    noBtn.style.transform = `scale(${noScale})`;
-    yesBtn.style.transform = `scale(${yesScale})`;
+    noBtn.style.transform = `scale(${noSize})`;
+    yesBtn.style.transform = `scale(${yesSize})`;
 }
 
-// Move No randomly
-function moveNoRandom() {
-    const btnWidth = noBtn.offsetWidth;
-    const btnHeight = noBtn.offsetHeight;
+// move NO when hovered
+noBtn.addEventListener("mouseenter", () => {
+    adjustSizes();
 
-    const maxX = window.innerWidth - btnWidth - 20;
-    const maxY = window.innerHeight - btnHeight - 20;
+    const maxX = window.innerWidth - noBtn.offsetWidth;
+    const maxY = window.innerHeight - noBtn.offsetHeight;
 
     noBtn.style.position = "fixed";
     noBtn.style.left = Math.random() * maxX + "px";
     noBtn.style.top = Math.random() * maxY + "px";
-}
-
-// Desktop hover
-noBtn.addEventListener("mouseenter", () => {
-    punishNo();
-    moveNoRandom();
 });
 
-// Mobile tap
+// mobile tap
 noBtn.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    punishNo();
-    moveNoRandom();
+    adjustSizes();
+
+    const maxX = window.innerWidth - noBtn.offsetWidth;
+    const maxY = window.innerHeight - noBtn.offsetHeight;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = Math.random() * maxX + "px";
+    noBtn.style.top = Math.random() * maxY + "px";
 });
 
-// YES CLICK
+// yes click
 yesBtn.addEventListener("click", () => {
     message.innerHTML =
         "You finally got that right! Congratulations on a lifetime deal for awesomeness ❤️";
@@ -155,15 +152,14 @@ yesBtn.addEventListener("click", () => {
 
     confetti({
         particleCount: 300,
-        spread: 120,
-        origin: { y: 0.6 }
+        spread: 120
     });
 });
 
-// Floating hearts
+// floating hearts
 function createHeart() {
     const heart = document.createElement("div");
-    heart.classList.add("heart");
+    heart.className = "heart";
     heart.innerHTML = "❤️";
     heart.style.left = Math.random() * 100 + "vw";
     heart.style.fontSize = (Math.random() * 20 + 15) + "px";
