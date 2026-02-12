@@ -6,6 +6,7 @@ const music = document.getElementById("bgMusic");
 
 let noScale = 1;
 let yesScale = 1;
+let movedOnce = false;
 
 // Start music once
 document.body.addEventListener("click", () => {
@@ -21,7 +22,7 @@ function punishNo() {
     yesBtn.style.transform = `scale(${yesScale})`;
 }
 
-// Move No button randomly (always inside viewport)
+// Move No button randomly (only after first hover)
 function moveNoRandom() {
     const btnWidth = noBtn.offsetWidth;
     const btnHeight = noBtn.offsetHeight;
@@ -37,26 +38,17 @@ function moveNoRandom() {
     noBtn.style.top = randomY + "px";
 }
 
-// DESKTOP: trigger when mouse gets near button
-document.addEventListener("mousemove", (e) => {
-    const rect = noBtn.getBoundingClientRect();
-
-    const distanceX = e.clientX - (rect.left + rect.width / 2);
-    const distanceY = e.clientY - (rect.top + rect.height / 2);
-
-    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-    if (distance < 100) {
-        moveNoRandom();
-        punishNo();
-    }
+// DESKTOP: move only on hover
+noBtn.addEventListener("mouseenter", () => {
+    punishNo();
+    moveNoRandom();
 });
 
-// MOBILE: dodge on touch
+// MOBILE: move only when tapped
 noBtn.addEventListener("touchstart", (e) => {
     e.preventDefault();
-    moveNoRandom();
     punishNo();
+    moveNoRandom();
 });
 
 // YES CLICK
