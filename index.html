@@ -28,26 +28,30 @@ h1 {
     margin-bottom: 40px;
 }
 
+.buttons {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+}
+
 button {
     font-size: 1.5rem;
     padding: 12px 30px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    position: absolute;
     transition: transform 0.3s ease;
 }
 
 #yesBtn {
     background: #ff4d6d;
     color: white;
-    left: -80px;
 }
 
 #noBtn {
     background: #444;
     color: white;
-    right: -80px;
+    position: relative;
 }
 
 #message {
@@ -78,8 +82,12 @@ button {
 
 <div class="container">
     <h1>Will you be my Valentine? 💌</h1>
-    <button id="yesBtn">Yes 💖</button>
-    <button id="noBtn">No 🙈</button>
+
+    <div class="buttons">
+        <button id="yesBtn">Yes 💖</button>
+        <button id="noBtn">No 🙈</button>
+    </div>
+
     <div id="message"></div>
 </div>
 
@@ -97,32 +105,11 @@ const music = document.getElementById("bgMusic");
 
 let noScale = 1;
 let yesScale = 1;
-let mouseX = 0;
-let mouseY = 0;
 
-// Start music on first interaction (browser rule)
+// Start music after first click (browser autoplay policy)
 document.body.addEventListener("click", () => {
     music.play();
 }, { once: true });
-
-// Track mouse
-document.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-});
-
-// No button slowly chases cursor
-function chaseCursor() {
-    const rect = noBtn.getBoundingClientRect();
-    const dx = mouseX - rect.left;
-    const dy = mouseY - rect.top;
-
-    noBtn.style.left = rect.left + dx * 0.02 + "px";
-    noBtn.style.top = rect.top + dy * 0.02 + "px";
-
-    requestAnimationFrame(chaseCursor);
-}
-chaseCursor();
 
 // Shrink No + Grow Yes
 function punishNo() {
@@ -138,6 +125,17 @@ function punishNo() {
 noBtn.addEventListener("mouseover", punishNo);
 noBtn.addEventListener("click", punishNo);
 
+// Make No slowly dodge cursor
+document.addEventListener("mousemove", (e) => {
+    const rect = noBtn.getBoundingClientRect();
+    const distanceX = e.clientX - rect.left;
+    const distanceY = e.clientY - rect.top;
+
+    if (Math.abs(distanceX) < 100 && Math.abs(distanceY) < 50) {
+        noBtn.style.transform += " translate(20px, -20px)";
+    }
+});
+
 yesBtn.addEventListener("click", () => {
     message.innerHTML = "You finally got that right! Congratulations on a lifetime deal for awesomeness ❤️";
     yesBtn.style.display = "none";
@@ -145,7 +143,7 @@ yesBtn.addEventListener("click", () => {
 
     confetti({
         particleCount: 300,
-        spread: 100
+        spread: 120
     });
 });
 
@@ -166,4 +164,3 @@ setInterval(createHeart, 300);
 
 </body>
 </html>
-
