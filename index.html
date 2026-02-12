@@ -19,28 +19,30 @@ body {
 }
 
 .container {
-    position: relative;
+    width: 90%;
+    max-width: 500px;
 }
 
 h1 {
     color: white;
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 40px;
 }
 
 .buttons {
     display: flex;
-    gap: 30px;
     justify-content: center;
+    gap: 20px;
+    position: relative;
 }
 
 button {
-    font-size: 1.5rem;
-    padding: 12px 30px;
+    font-size: 1.2rem;
+    padding: 12px 25px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 #yesBtn {
@@ -55,7 +57,7 @@ button {
 }
 
 #message {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: white;
     margin-top: 30px;
 }
@@ -73,6 +75,18 @@ button {
     to {
         transform: translateY(-110vh);
         opacity: 0;
+    }
+}
+
+/* Smaller screens */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    button {
+        font-size: 1rem;
+        padding: 10px 20px;
     }
 }
 </style>
@@ -106,7 +120,7 @@ const music = document.getElementById("bgMusic");
 let noScale = 1;
 let yesScale = 1;
 
-// Start music after first click (browser autoplay policy)
+// Start music after first interaction (required for mobile)
 document.body.addEventListener("click", () => {
     music.play();
 }, { once: true });
@@ -122,19 +136,25 @@ function punishNo() {
     yesBtn.style.transform = `scale(${yesScale})`;
 }
 
+// Desktop hover
 noBtn.addEventListener("mouseover", punishNo);
-noBtn.addEventListener("click", punishNo);
 
-// Make No slowly dodge cursor
-document.addEventListener("mousemove", (e) => {
-    const rect = noBtn.getBoundingClientRect();
-    const distanceX = e.clientX - rect.left;
-    const distanceY = e.clientY - rect.top;
-
-    if (Math.abs(distanceX) < 100 && Math.abs(distanceY) < 50) {
-        noBtn.style.transform += " translate(20px, -20px)";
-    }
+// Mobile tap
+noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    punishNo();
+    moveNoRandom();
 });
+
+// Move No randomly on mobile
+function moveNoRandom() {
+    const maxX = window.innerWidth - 100;
+    const maxY = window.innerHeight - 100;
+
+    noBtn.style.position = "absolute";
+    noBtn.style.left = Math.random() * maxX + "px";
+    noBtn.style.top = Math.random() * maxY + "px";
+}
 
 yesBtn.addEventListener("click", () => {
     message.innerHTML = "You finally got that right! Congratulations on a lifetime deal for awesomeness ❤️";
