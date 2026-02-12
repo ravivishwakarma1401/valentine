@@ -21,6 +21,7 @@ body {
 .container {
     width: 90%;
     max-width: 500px;
+    position: relative;
 }
 
 h1 {
@@ -62,7 +63,6 @@ button {
     margin-top: 30px;
 }
 
-/* Floating hearts */
 .heart {
     position: fixed;
     bottom: -10px;
@@ -75,18 +75,6 @@ button {
     to {
         transform: translateY(-110vh);
         opacity: 0;
-    }
-}
-
-/* Smaller screens */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    button {
-        font-size: 1rem;
-        padding: 10px 20px;
     }
 }
 </style>
@@ -120,17 +108,26 @@ const music = document.getElementById("bgMusic");
 let noScale = 1;
 let yesScale = 1;
 
-// Start music after first interaction (required for mobile)
+// Force reset on page load
+window.onload = () => {
+    noBtn.style.transform = "scale(1)";
+    yesBtn.style.transform = "scale(1)";
+    noBtn.style.position = "relative";
+    noBtn.style.left = "0px";
+    noBtn.style.top = "0px";
+};
+
+// Start music once (browser policy safe)
 document.body.addEventListener("click", () => {
-    music.play();
+    if (music.paused) {
+        music.play().catch(() => {});
+    }
 }, { once: true });
 
-// Shrink No + Grow Yes
+// Shrink No + Grow Yes safely
 function punishNo() {
-    noScale -= 0.1;
+    noScale = Math.max(0.3, noScale - 0.1);
     yesScale += 0.1;
-
-    if (noScale < 0.3) noScale = 0.3;
 
     noBtn.style.transform = `scale(${noScale})`;
     yesBtn.style.transform = `scale(${yesScale})`;
@@ -146,10 +143,10 @@ noBtn.addEventListener("touchstart", (e) => {
     moveNoRandom();
 });
 
-// Move No randomly on mobile
+// Move No randomly (clean move, no stacking)
 function moveNoRandom() {
-    const maxX = window.innerWidth - 100;
-    const maxY = window.innerHeight - 100;
+    const maxX = window.innerWidth - 120;
+    const maxY = window.innerHeight - 80;
 
     noBtn.style.position = "absolute";
     noBtn.style.left = Math.random() * maxX + "px";
@@ -163,7 +160,8 @@ yesBtn.addEventListener("click", () => {
 
     confetti({
         particleCount: 300,
-        spread: 120
+        spread: 120,
+        origin: { y: 0.6 }
     });
 });
 
@@ -179,7 +177,7 @@ function createHeart() {
     setTimeout(() => heart.remove(), 5000);
 }
 
-setInterval(createHeart, 300);
+setInterval(createHeart, 400);
 </script>
 
 </body>
